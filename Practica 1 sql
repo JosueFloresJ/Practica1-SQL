@@ -1,0 +1,199 @@
+--Josue FLores Jimenez C-12912
+--Crear base de datos 
+CREATE DATABASE Practica 
+go
+-- uso base de datos 
+use Practica
+--Creacion de tablas
+--Para direccion
+CREATE TABLE Direccion(
+id_direccion int NOT NULL primary key,
+Provincia VARCHAR(20) not null,
+    Canton VARCHAR(50) not null,
+    Distrito VARCHAR(50) not null
+)
+
+--Para proveedor
+CREATE TABLE Proveedor (
+Nombre_Prove VARCHAR(50) NOT NULL PRIMARY KEY,
+Cedula_Prove VARCHAR(20),
+Numero_Tel INT,
+Tipo VARCHAR(20),--Si es una empresa o una persona
+Correo_Prove VARCHAR(50),
+Sociedad VARCHAR(50),-- sociedad a la que pertenece
+id_direccion INT NOT NULL,
+CONSTRAINT fk_dir FOREIGN KEY (id_direccion) REFERENCES Direccion(id_direccion)
+)
+--Para Categoria
+CREATE TABLE Categoria(
+ID_Categoria INT IDENTITY (1,1) PRIMARY KEY,
+NombreCat varchar (30)
+)
+--Para Subcategoria
+CREATE TABLE Subcategoria(
+ID_Subcategoria INT IDENTITY (1,1) PRIMARY KEY,
+NombreSub varchar (30),
+ID_Categoria int /*llave foranea*/
+constraint fk_idcat foreign key (ID_Categoria) references Categoria(ID_Categoria)
+)
+--Para Producto
+CREATE TABLE Producto(
+ID_Interno int NOT NULL primary key,
+ID_Universal int IDENTITY (1,1),
+Nombre_Pro varchar (50) NOT NULL,
+Tamaño varchar (50),
+Precio int CHECK (Precio >=0) NOT NULL,
+Color varchar (30),
+Nombre_Prove varchar (50) NOT NULL,/*llave foranea*/
+ID_Subcategoria INT NOT NULL,/*llave foranea*/
+constraint fk_ced foreign key (Nombre_Prove) references Proveedor(Nombre_Prove),
+constraint fk_idsub foreign key (ID_Subcategoria) references Subcategoria(ID_Subcategoria)
+)
+--Para Clientes
+CREATE TABLE Cliente(
+Cedulacliente int primary key NOT NULL,
+Nombre varchar (50),
+correo varchar (50),
+Direccion varchar (100)
+)
+--Para Facturas
+CREATE TABLE Factura(
+#factura int IDENTITY (1,1) PRIMARY KEY,
+Fechaemision date NOT NULL,
+impuestos tinyint check (impuestos >= 0 AND impuestos <=13),
+descuento tinyint check (descuento >= 0 AND descuento <=10),
+Cedulacliente int NOT NULL,
+constraint fk_Cecli foreign key (Cedulacliente) references Cliente(Cedulacliente)
+)
+CREATE TABLE FactProd (
+    ID_FactProd int IDENTITY (1,1) PRIMARY KEY,
+	cantidad int check (cantidad >0),
+	#factura int NOT NULL,
+    ID_Interno int NOT NULL,
+    constraint fk_#fac FOREIGN KEY (#factura) REFERENCES Factura(#factura),
+    constraint fk_ FOREIGN KEY (ID_Interno) REFERENCES Producto(ID_Interno)
+)
+--Datos que contiene la tabla direccion
+insert into Direccion (id_direccion,Provincia,Canton,Distrito) values 
+(10110 ,'San Jose','San jose','Hatillo'),
+(11501 ,'San Jose','Montes de Oca','San Pedro'),
+(20101 ,'Alajuela','Alajuela','Alajuela'),
+(30201 ,'Cartago','Paraiso','Paraiso'),
+(40101 ,'Heredia','Heredia','Heredia'),
+(40901 ,'Heredia','San Pablo','San Pablo'),
+(60701 ,'Puntarenas','Golfito','Golfito'),
+(70101 ,'Limon','Limon','Limon')
+
+--Datos que contiene la tabla proveedor
+insert into Proveedor (Cedula_Prove,Numero_Tel,Tipo,Correo_Prove,Nombre_Prove,Sociedad,id_direccion) values
+('Juridica',88309056,'Empresa','Proveedor1@gmail.com','Proveedor1','anonima',10110),
+('Fisica',12345678,'Empresa','Proveedor2@gmail.com','Proveedor2','persona',40901),
+('Juridica',23456789,'Persona','Proveedor3@gmail.com','Proveedor3','anonima',20101),
+('Juridica',34567890,'Empresa','Proveedor4@gmail.com','Proveedor4','persona',10110),
+('Fisica',45678901,'Persona','Proveedor5@gmail.com','Proveedor5','anonima',40901),
+('Fisica',56789012,'Empresa','Proveedor6@gmail.com','Proveedor6','anonima',11501),
+('Juridica',67890123,'Persona','Proveedor7@gmail.com','Proveedor7','persona',30201),
+('Juridica',78901234,'Empresa','Proveedor8@gmail.com','Proveedor8','persona',60701),
+('Fisica',89012345,'Persona','Proveedor9@gmail.com','Proveedor9','persona',70101)
+
+--Dato para tabla Categoria
+insert into Categoria(NombreCat) values
+('Alimentacion'),
+('Construccion'),
+('Higiene')
+
+--Datos Para tabla Subcategoria
+insert into Subcategoria(NombreSub,ID_Categoria) values
+('Latas',1),
+('Granos basicos',1),
+('Cemento',2),
+('Ceramica',2),
+('Bucal',3),
+('Facial',3)
+
+--Datos para tabla Producto
+insert into Producto(ID_Interno,Nombre_Pro,Tamaño,Precio,Color,Nombre_Prove,ID_Subcategoria) values
+(1001,'Arroz Integral', '1 kg', 4500, 'Blanco','Proveedor1',1),  
+(1002,'Arroz Integral', '1 kg', 4000, 'Blanco','Proveedor2',1),
+(1003,'Arroz Integral', '1 kg', 3900, 'Blanco','Proveedor3',1), 
+(1004, 'Atun', '450g',1200,'celese','Proveedor1',2),
+(1005, 'Atun', '450g',1000,'azul','Proveedor3',2),
+(2001,'Cemento', '50 kg', 30000, 'Blanco','Proveedor4',3),  
+(2002,'Cemento', '50 kg', 24000, 'Gris','Proveedor5',3), 
+(2003,'Cemento', '50 kg', 20000, 'Blanco','Proveedor6',3),    
+(2004, 'Ceramica', '10 kg',15000,'Amarillo','Proveedor5',4),
+(2005, 'Ceramica', '10 kg',10000,'Azul','Proveedor7',4),
+(3001,'Cepillo de dientes','15g' , 1200, 'Morado','Proveedor9',5),  
+(3002,'Crema', '450ml', 4500, 'Verde','Proveedor8',6) 
+
+insert into Cliente(Cedulacliente,Nombre,correo,Direccion) values
+(789365843, 'Janna', 'jbaldrick0@yelp.com', '878 Havey Plaza'),
+(223145685, 'Agustin', 'agoodered1@ted.com', '11 Lyons Trail'),
+(592324466, 'Koren', 'kculligan2@disqus.com', '385 Boyd Plaza'),
+(421114067, 'Kerwin', 'kmonelle3@wsj.com', '28 Springs Crossing'),
+(723245243, 'Rhona', 'ryeskin4@wired.com', '74 Crest Line Parkway'),
+(748371688, 'Mirabelle', 'mmolineaux5@webmd.com', '7813 Grasskamp Pass'),
+(897304310, 'Jerrome', 'jjoddins6@wsj.com', '53 Banding Road'),
+(359784188, 'Vail', 'vcholmondeley7@pbs.org', '4111 Oxford Alley'),
+(292621959, 'Ulrica', 'uoregan8@bing.com', '11 Claremont Alley'),
+(671614844, 'Vasilis', 'vgerrelt9@deliciousdays.com', '51 Morning Alley'),
+(829204555, 'Emmie', 'ebernardona@ustream.tv', '35168 Bayside Avenue'),
+(466607273, 'Shadow', 'ssynkeb@yale.edu', '37 Fieldstone Junction'),
+(384657437, 'Shara', 'sosullivanc@fda.gov', '696 Havey Hill'),
+(208952407, 'Sharyl', 'srushtond@istockphoto.com', '34008 Pine View Plaza'),
+(841095299, 'Tedie', 'tleurene@about.me', '52910 Straubel Place'),
+(416810759, 'Westbrooke', 'wtalmanf@photobucket.com', '4 Mariners Cove Pass'),
+(479656712, 'Flemming', 'folliveg@yellowbook.com', '17314 Anderson Circle'),
+(135290223, 'Margette', 'msheddenh@wp.com', '0 Lawn Way'),
+(971328193, 'Lissie', 'lchessili@cbsnews.com', '30 Springview Parkway'),
+(454375367, 'Silvio', 'spurvisj@geocities.jp', '8676 Lawn Junction')
+
+
+insert into Factura (Fechaemision,impuestos,descuento,Cedulacliente)values
+('2023-01-09', 12, 0,789365843),
+('2023-01-18',  10, 3,223145685),
+('2023-01-06', 10, 5,592324466),
+('2023-01-30',  12, 10,421114067),
+('2023-01-29',  11, 3,723245243),
+('2023-02-11',  11, 1,748371688),
+('2023-02-27',  12, 4,897304310),
+('2023-02-13',  13, 6,359784188),
+('2023-01-31',  11, 2,292621959),
+('2023-02-08',  11, 6,671614844),
+('2023-02-03',  12, 6,829204555),
+('2023-01-10',  12, 5,466607273),
+('2023-01-28',  13, 7,384657437),
+('2023-01-13',  12, 4,208952407),
+('2023-01-11',  12, 6,841095299),
+('2023-02-12',  12, 9,416810759),
+('2023-01-15',  12, 4,479656712),
+('2023-02-21',  13, 10,135290223),
+('2023-01-25',  10, 1,971328193),
+('2023-02-01', 10, 7,454375367)
+
+insert into FactProd (cantidad,#factura,ID_Interno) values
+(1, 1,1004),
+(2, 2,2004),
+(2, 3,3002),
+(1, 4,1003),
+(1, 5,2001),
+(1, 6,3002),
+(2, 7,1002),
+(2, 8,2005),
+(1, 9,3002),
+(2, 10,1005),
+(2, 11,2003),
+(1, 12,3001),
+(2, 13,1002),
+(2, 14,2002),
+(2, 15,2004),
+(2, 16,2005),
+(1, 17,3001),
+(1, 18,2002),
+(2, 19,3002),
+(2, 20,3001),
+(1,1,1003),
+(1,2,1003),
+(1,3,1001),
+(1,4,1005),
+(1,5,1001)
